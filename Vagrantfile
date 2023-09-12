@@ -7,9 +7,6 @@ Vagrant.configure("2") do |config|
   # Private network configuration
   config.vm.network "private_network", type: "static", ip: "192.168.56.11"
 
-  # # SSH agent forwarding
-  # config.ssh.forward_agent = true
-
   config.vm.provision "shell", inline: <<-SHELL
     # Update and upgrade the system
     sudo apt-get update && sudo apt-get upgrade -y
@@ -36,11 +33,22 @@ Vagrant.configure("2") do |config|
     sudo curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
 
-    # Enable password authentication
-    sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-    sudo service ssh restart
+    # Add vagrant user to docker group
+    sudo usermod -aG docker vagrant
 
-    # Set password for 'vagrant' user
-    echo "vagrant:PLACEHOLDER_PASSWORD" | sudo chpasswd
+    # Create SSH directory for vagrant user if not exists
+    sudo -u vagrant mkdir -p /home/vagrant/.ssh
+
+    # Fetch the public key from synced folder
+    cat /vagrant/ssh_keys/jenkins_key.pub >> /home/vagrant/.ssh/authorized_keys
+
+    # Ensure correct permissions
+    sudo chmod 700 /home/vagrant/.ssh
+    sudo chmod 600 /home/vagrant/.ssh/authorized_keys
+    sudo chown -R vagrant:vagrant /home/vagrant/.ssh/
+
+    # Disable password authentication for SSH
+    sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sudo service ssh restart
   SHELL
 end

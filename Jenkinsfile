@@ -28,6 +28,17 @@ pipeline {
                             cd ${params.BASE_PATH}
                             tar -czf ${params.BACKUP_DIR}/\$(date '+%Y-%m-%d-%H-%M')-backup.zip ${params.APP_DIR}
                         fi
+                    \"
+                """
+            }
+        }
+        stage('Compose down and move files') {
+            steps {
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${params.SSH_USER}@${params.SSH_IP} \"
+                        # Docker-compose down
+                        cd ${params.BASE_PATH}/${params.APP_DIR}
+                        docker-compose down
 
                         # Move files
                         rm -rf ${params.BASE_PATH}/${params.APP_DIR}/*
@@ -41,7 +52,6 @@ pipeline {
                 sh """
                     ssh -o StrictHostKeyChecking=no ${params.SSH_USER}@${params.SSH_IP} \"
                         cd ${params.BASE_PATH}/${params.APP_DIR}
-                        docker-compose down
                         docker-compose build
                         docker-compose up -d
                     \"

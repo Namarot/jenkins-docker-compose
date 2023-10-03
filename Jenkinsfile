@@ -43,10 +43,7 @@ def envDetails = [
     ]
 ]
 
-def getBranchName(String fullBranchName) {
-    return fullBranchName.split('/')[-1]
-}
-
+def extractedBranch
 
 def remote = [:]
 remote.allowAnyHosts = true
@@ -79,27 +76,27 @@ pipeline {
                     // Debug: Print the value of env.GIT_BRANCH
                     echo "env.GIT_BRANCH: ${env.GIT_BRANCH}"
                     
-                    // Check if GIT_BRANCH exists and modify it in place
+                    // Check if GIT_BRANCH exists and extract branch name
                     if (env.GIT_BRANCH) {
                         def parts = env.GIT_BRANCH.split('/')
-                        if (parts.length > 1) {
-                            env.GIT_BRANCH = parts[-1]
+                        if (parts.size() > 1) {
+                            extractedBranch = parts[1]
                         }
                     } else if (params.envToDeploy) {
-                        env.GIT_BRANCH = params.envToDeploy
+                        extractedBranch = params.envToDeploy
                     } else {
                         error("No environment selected")
                     }
 
-                    // Debug: Print the value of env.GIT_BRANCH after modification
-                    echo "env.GIT_BRANCH (after assignment): ${env.GIT_BRANCH}"
+                    // Debug: Print the value of extractedBranch after extraction
+                    echo "Extracted Branch: ${extractedBranch}"
 
-                    // Ensure the GIT_BRANCH value is one of 'dev', 'test', 'prod'
-                    if (!(envDetails.keySet().contains(env.GIT_BRANCH))) {
-                        error("Invalid branch: ${env.GIT_BRANCH}")
+                    // Ensure the extractedBranch value is one of 'dev', 'test', 'prod'
+                    if (!(envDetails.keySet().contains(extractedBranch))) {
+                        error("Invalid branch: ${extractedBranch}")
                     }
 
-                    chosenEnv = envDetails[env.GIT_BRANCH]
+                    chosenEnv = envDetails[extractedBranch]
                     remote.name = chosenEnv.remoteName
                     remote.host = chosenEnv.remoteHost
                     remote.post = chosenEnv.remotePort

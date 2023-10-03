@@ -9,11 +9,11 @@ app = FastAPI()
 @app.get("/")
 def hello_world():
     roll = random.random() * 100
-    if roll < 30:
+    if roll < 15:
         raise HTTPException(status_code=500, detail="[500] Internal Server Error")
-    elif 30 <= roll < 60:
+    elif 15 <= roll < 30:
         raise HTTPException(status_code=400, detail="[400] Bad Request")
-    elif 60 <= roll < 90:
+    elif 30 <= roll < 45:
         raise HTTPException(status_code=404, detail="[404] Not Found")
     
     return {"message": "[200] OK"}

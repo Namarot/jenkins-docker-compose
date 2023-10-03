@@ -79,16 +79,19 @@ pipeline {
                     // Debug: Print the value of env.GIT_BRANCH
                     echo "env.GIT_BRANCH: ${env.GIT_BRANCH}"
                     
-                    // If the pipeline is not triggered by webhook
+                    // Check if GIT_BRANCH exists and modify it in place
                     if (env.GIT_BRANCH) {
-                        env.GIT_BRANCH = getBranchName(env.GIT_BRANCH)
+                        def parts = env.GIT_BRANCH.split('/')
+                        if (parts.length > 1) {
+                            env.GIT_BRANCH = parts[-1]
+                        }
                     } else if (params.envToDeploy) {
                         env.GIT_BRANCH = params.envToDeploy
                     } else {
                         error("No environment selected")
                     }
 
-                    // Debug: Print the value of env.GIT_BRANCH after assignment
+                    // Debug: Print the value of env.GIT_BRANCH after modification
                     echo "env.GIT_BRANCH (after assignment): ${env.GIT_BRANCH}"
 
                     // Ensure the GIT_BRANCH value is one of 'dev', 'test', 'prod'

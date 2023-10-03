@@ -1,14 +1,58 @@
+def envDetails = [
+    dev: [
+        sshCredentialId: 'jenkinsDev',
+        remoteName: 'vagrant',
+        remoteHost: '192.168.56.11',
+        remotePort: '22',
+        remoteUser: 'vagrant',
+        gitBranch: 'dev',
+        appDir: 'jenkins_app_dev',
+        appPort: '9000',
+        basePath: '~',
+        cloneDir: 'jenkins_app_repo_dev',
+        backupDir: 'jenkins_app_backup_dev'
+    ],
+    test: [
+        sshCredentialId: 'jenkinsTest',
+        remoteName: 'vagrant',
+        remoteHost: '192.168.56.11',
+        remotePort: '22',
+        remoteUser: 'vagrant',
+        gitBranch: 'test',
+        appDir: 'jenkins_app_test',
+        appPort: '10000',
+        basePath: '~',
+        cloneDir: 'jenkins_app_repo_test',
+        backupDir: 'jenkins_app_backup_test'
+    ],
+    prod: [
+        sshCredentialId: 'jenkinsProd',
+        remoteName: 'vagrant',
+        remoteHost: '192.168.56.11',
+        remotePort: '22',
+        remoteUser: 'vagrant',
+        gitBranch: 'prod',
+        appDir: 'jenkins_app_prod',
+        appPort: '11000',
+        basePath: '~',
+        cloneDir: 'jenkins_app_repo_prod',
+        backupDir: 'jenkins_app_backup_prod'
+    ]
+]
+
 pipeline {
     agent any
 
     parameters {
-        string(name: 'SSH_USER', defaultValue: 'vagrant', description: 'SSH User for the VM')
-        string(name: 'SSH_IP', defaultValue: '192.168.56.11', description: 'IP Address for the VM')
-        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/Namarot/jenkins-docker-compose.git', description: 'Git Repository URL')
-        string(name: 'BASE_PATH', defaultValue: '~', description: 'Base Directory for Operations')
-        string(name: 'CLONE_DIR', defaultValue: 'jenkinsapprepo', description: 'Directory Name for Cloned Repo')
-        string(name: 'APP_DIR', defaultValue: 'jenkinsapp', description: 'Application Directory')
-        string(name: 'BACKUP_DIR', defaultValue: 'jenkinsappbackups', description: 'Backup Directory')
+        choice(
+            name: 'envToDeploy', 
+            choices: envDetails.keySet() as List, 
+            description: 'Choose an environment to deploy'
+        )
+    }
+
+    environment {
+        GIT_REPO_URL = 'https://github.com/Namarot/jenkins-docker-compose.git'
     }
 
     stages {

@@ -43,6 +43,11 @@ def envDetails = [
     ]
 ]
 
+def getBranchName(String fullBranchName) {
+    return fullBranchName.split('/')[-1]
+}
+
+
 def remote = [:]
 remote.allowAnyHosts = true
 
@@ -75,11 +80,12 @@ pipeline {
                     echo "env.GIT_BRANCH: ${env.GIT_BRANCH}"
                     
                     // If the pipeline is not triggered by webhook
-                    if (!env.GIT_BRANCH) {
-                        if (!params.envToDeploy) {
-                            error("No environment selected")
-                        }
+                    if (env.GIT_BRANCH) {
+                        env.GIT_BRANCH = getBranchName(env.GIT_BRANCH)
+                    } else if (params.envToDeploy) {
                         env.GIT_BRANCH = params.envToDeploy
+                    } else {
+                        error("No environment selected")
                     }
 
                     // Debug: Print the value of env.GIT_BRANCH after assignment

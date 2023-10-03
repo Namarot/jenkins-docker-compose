@@ -7,5 +7,5 @@ services:
     environment:
       PORT: 8000
     ports:
-      - '8000:8000'
+      - '${APP_EXT_PORT:-9000}:8000'
     restart: "no"

@@ -78,6 +78,7 @@ pipeline {
                 script {
                     // Debug: Print the value of env.GIT_BRANCH
                     echo "env.GIT_BRANCH: ${env.GIT_BRANCH}"
+                    printenv
                     
                     // Check if GIT_BRANCH exists and extract branch name
                     if (params.envToDeploy) {

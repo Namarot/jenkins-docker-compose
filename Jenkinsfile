@@ -1,4 +1,7 @@
 def envDetails = [
+    '': [
+
+    ],
     dev: [
         sshCredentialId: 'jenkinsDev',
         remoteName: 'vagrant',
@@ -78,7 +81,7 @@ pipeline {
                     
                     // Check if GIT_BRANCH exists and extract branch name
                     if (params.envToDeploy) {
-                        echo "params.envToDeplot: ${params.envToDeploy}"
+                        echo "params.envToDeploy: ${params.envToDeploy}"
                         extractedBranch = params.envToDeploy
                     } else if (env.GIT_BRANCH) {
                         def parts = env.GIT_BRANCH.split('/')

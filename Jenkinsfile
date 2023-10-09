@@ -77,13 +77,13 @@ pipeline {
                     echo "env.GIT_BRANCH: ${env.GIT_BRANCH}"
                     
                     // Check if GIT_BRANCH exists and extract branch name
-                    if (env.GIT_BRANCH) {
+                    if (params.envToDeploy) {
+                        extractedBranch = params.envToDeploy
+                    } else if (env.GIT_BRANCH) {
                         def parts = env.GIT_BRANCH.split('/')
                         if (parts.size() > 1) {
                             extractedBranch = parts[1]
                         }
-                    } else if (params.envToDeploy) {
-                        extractedBranch = params.envToDeploy
                     } else {
                         error("No environment selected")
                     }
